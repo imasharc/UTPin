@@ -21,10 +21,49 @@
       <% end %>
     </div>
 
-  <% else %>
+<% else %>
     <div style="text-align: center;">
-      <img src="<%= @document.image_url %>" style="max-width: 100%; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-radius: 8px;" />
+      
+      <div data-controller="annotation" 
+           data-annotation-target="container"
+           data-annotation-document-id-value="<%= @document.id %>"
+           data-action="click->annotation#dropPin"
+           style="position: relative; display: inline-block; max-width: 100%;">
+           
+        <img src="<%= @document.image_url %>" style="display: block; max-width: 100%; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px;" />
+      
+        <% @document.pins.each do |pin| %>
+          <a href="#comment-<%= pin.id %>" onclick="event.stopPropagation()" style="position: absolute; left: <%= pin.x_coordinate %>%; top: <%= pin.y_coordinate %>%; transform: translate(-50%, -100%); font-size: 24px; cursor: pointer; z-index: 10; text-decoration: none;" title="<%= pin.body %>">
+            📍
+            <div style="position: absolute; top: -5px; right: -10px; background: #e91e63; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: sans-serif; font-weight: bold; border: 2px solid white;">
+              <%= pin.marker_number %>
+            </div>
+          </a>
+        <% end %>
+
+      </div>
     </div>
+
+    <% if @document.pins.any? %>
+      <div style="margin-top: 50px; text-align: left; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+        <h3 style="margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">Comments (<%= @document.pins.count %>)</h3>
+        
+        <% @document.pins.order(:marker_number).each do |pin| %>
+          
+          <div id="comment-<%= pin.id %>" style="margin-bottom: 15px; padding: 15px; background: #f9f9f9; border-radius: 6px; border-left: 4px solid #e91e63; display: flex; gap: 15px;">
+            <div style="background: #e91e63; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+              <%= pin.marker_number %>
+            </div>
+            <div>
+              <p style="margin: 0; color: #333; font-size: 16px; line-height: 1.5;"><%= pin.body %></p>
+              <small style="color: #999; font-size: 12px;"><%= time_ago_in_words(pin.created_at) %> ago</small>
+            </div>
+          </div>
+
+        <% end %>
+      </div>
+    <% end %>
+
   <% end %>
 
 </div>
