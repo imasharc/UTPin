@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   post "capture", to: "home#capture"
 
-  resources :documents, only: [:create, :show, :update] do
+  resources :documents, only: [:create, :show, :update, :destroy] do
     resources :pins, only: [:create]
   end
 

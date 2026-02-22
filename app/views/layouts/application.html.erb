@@ -23,6 +23,11 @@
   </head>
 
   <body>
+    <% if notice.present? %>
+      <div data-controller="flash" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #4caf50; color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; font-family: sans-serif; font-weight: bold; transition: opacity 0.5s ease;">        ✅ <%= notice %>
+      </div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
