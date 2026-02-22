@@ -1,0 +1,30 @@
+<div style="max-width: 1000px; margin: 40px auto; font-family: sans-serif;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+    <h2>📄 <%= @document.title %></h2>
+    <%= link_to "← Back to Home", root_path, style: "color: #666; text-decoration: none;" %>
+  </div>
+
+  <% if @document.image_url.blank? %>
+    <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
+      <h3>Add an image to this document</h3>
+
+      <%= form_with url: document_path(@document), method: :patch, data: { turbo: false } do |form| %>
+        <%= form.url_field :website_url, placeholder: "https://...", required: true, style: "padding: 10px; width: 300px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc;" %>
+
+        <span style="margin-left: 10px; font-size: 16px;">
+          <%= form.check_box :full_page %>
+          <%= form.label :full_page, "Full Page" %>
+        </span>
+
+        <%= form.submit "Capture Website", style: "padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #e91e63; color: white; border: none; border-radius: 4px; margin-left: 15px;" %>
+      <% end %>
+    </div>
+
+  <% else %>
+    <div style="text-align: center;">
+      <img src="<%= @document.image_url %>" style="max-width: 100%; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-radius: 8px;" />
+    </div>
+  <% end %>
+
+</div>
