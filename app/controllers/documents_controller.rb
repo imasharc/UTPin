@@ -1,6 +1,6 @@
-require 'uri'
-require 'net/http'
-require 'json'
+require "uri"
+require "net/http"
+require "json"
 
 class DocumentsController < ApplicationController
   def create
@@ -16,7 +16,7 @@ class DocumentsController < ApplicationController
     @document = Document.find(params[:id])
 
     target_url = params[:website_url]
-    wants_full_page = (params[:full_page] == "1") 
+    wants_full_page = (params[:full_page] == "1")
 
     base_url = "https://api.microlink.io/"
     api_params = { url: target_url, force: "true" }
@@ -35,7 +35,7 @@ class DocumentsController < ApplicationController
 
     request = Net::HTTP::Get.new(uri)
     response = http.request(request)
-    
+
     result = JSON.parse(response.body)
 
     if result["status"] == "success"
