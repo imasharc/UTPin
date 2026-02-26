@@ -1,15 +1,15 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  document: one
+  page: one
   x_coordinate: 1.5
   y_coordinate: 1.5
   marker_number: 1
   body: MyText
 
 two:
-  document: two
+  page: two
   x_coordinate: 1.5
   y_coordinate: 1.5
-  marker_number: 1
+  marker_number: 2
   body: MyText
