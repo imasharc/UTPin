@@ -13,10 +13,10 @@ class PagesController < ApplicationController
     uri.query = URI.encode_www_form(api_params)
     response = Net::HTTP.get(uri)
     result = JSON.parse(response)
-    
+
     if result["status"] == "success"
       screenshot_url = result.dig("data", "screenshot", "url")
-      
+
       # Create a new Page at the end of the list
       @document.pages.create(image_url: screenshot_url, position: @document.pages.count + 1)
     end

@@ -5,10 +5,10 @@ class RemoveDocumentFromPins < ActiveRecord::Migration[8.0]
     Document.all.each do |doc|
       if doc.image_url.present?
         puts "Migrating Document #{doc.id} in Production..."
-        
+
         # Create the new page
         new_page = Page.create(document_id: doc.id, image_url: doc.image_url, position: 1)
-        
+
         # Move all pins belonging to this document over to the new page
         Pin.where(document_id: doc.id).update_all(page_id: new_page.id)
       end
