@@ -1,3 +1,5 @@
 class Document < ApplicationRecord
-  has_many :pins, dependent: :destroy
+  has_many :pages, dependent: :destroy
+
+  has_many :pins, through: :pages
 end

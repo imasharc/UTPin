@@ -10,24 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_22_093718) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_26_144057) do
   create_table "documents", force: :cascade do |t|
-    t.string "title"
-    t.string "image_url"
     t.datetime "created_at", null: false
+    t.string "image_url"
+    t.string "title"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "pages", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.string "image_url"
+    t.integer "position"
+    t.datetime "updated_at", null: false
+    t.index ["document_id"], name: "index_pages_on_document_id"
   end
 
   create_table "pins", force: :cascade do |t|
-    t.integer "document_id", null: false
-    t.float "x_coordinate"
-    t.float "y_coordinate"
-    t.integer "marker_number"
     t.text "body"
     t.datetime "created_at", null: false
+    t.integer "marker_number"
+    t.integer "page_id"
     t.datetime "updated_at", null: false
-    t.index ["document_id"], name: "index_pins_on_document_id"
+    t.float "x_coordinate"
+    t.float "y_coordinate"
+    t.index ["page_id"], name: "index_pins_on_page_id"
   end
 
-  add_foreign_key "pins", "documents"
+  add_foreign_key "pages", "documents"
+  add_foreign_key "pins", "pages"
 end

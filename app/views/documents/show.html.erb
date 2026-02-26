@@ -1,69 +1,73 @@
-<div style="max-width: 1000px; margin: 40px auto; font-family: sans-serif;">
+<style>
+  /* The animation: Starts pink, waits a moment, then fades to transparent */
+  @keyframes highlight-fade {
+    0%, 30% { background-color: #fce4ec; transform: scale(1.02); }
+    100% { background-color: transparent; transform: scale(1); }
+  }
 
-  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
-    <h2>📄 <%= @document.title %></h2>
-    <%= link_to "← Back to Home", root_path, style: "color: #666; text-decoration: none;" %>
+  /* The trigger: Applied automatically when the browser jumps to this anchor */
+  .comment-row:target {
+    animation: highlight-fade 1.5s ease-out;
+  }
+</style>
+
+<div style="position: sticky; top: 0; z-index: 1000; background: white; border-bottom: 1px solid #ddd; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <%= link_to "←", root_path, style: "text-decoration: none; font-size: 20px; color: #555;" %>
+    
+    <input type="text" value="<%= @document.title %>" style="font-size: 18px; font-weight: 500; border: none; padding: 5px; border-radius: 4px; width: 300px;" placeholder="Untitled Document">
   </div>
 
-  <% if @document.image_url.blank? %>
-    <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
-      <h3>Add an image to this document</h3>
+  <div style="display: flex; gap: 10px;">
+    <%= form_with url: document_pages_path(@document), method: :post, data: { turbo: false }, style: "display: flex; gap: 5px;" do |form| %>
+      <%= form.text_field :website_url, placeholder: "Paste URL (e.g. apple.com)...", required: true, style: "padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" %>
+      <%= form.submit "+ Add Page", style: "background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;" %>
+    <% end %>
+  </div>
+</div>
 
-      <%= form_with url: document_path(@document), method: :patch, data: { turbo: false } do |form| %>
-        <%= form.url_field :website_url, placeholder: "https://...", required: true, style: "padding: 10px; width: 300px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc;" %>
+<div style="background-color: #f0f2f5; min-height: 100vh; padding: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 40px;">
 
-        <span style="margin-left: 10px; font-size: 16px;">
-          <%= form.check_box :full_page %>
-          <%= form.label :full_page, "Full Page" %>
-        </span>
-
-        <%= form.submit "Capture Website", style: "padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #e91e63; color: white; border: none; border-radius: 4px; margin-left: 15px;" %>
-      <% end %>
-    </div>
-
-<% else %>
-    <div style="text-align: center;">
+  <% @pages.each_with_index do |page, index| %>
+    
+    <div style="background: white; width: 100%; max-width: 1000px; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); padding: 50px; border-radius: 2px;">
       
+      <div style="color: #ccc; margin-bottom: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Page <%= index + 1 %></div>
+
       <div data-controller="annotation" 
            data-annotation-target="container"
+           data-annotation-page-id-value="<%= page.id %>" 
            data-annotation-document-id-value="<%= @document.id %>"
            data-action="click->annotation#dropPin"
-           style="position: relative; display: inline-block; max-width: 100%;">
+           style="position: relative; display: inline-block; width: 100%;">
            
-        <img src="<%= @document.image_url %>" style="display: block; max-width: 100%; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px;" />
+        <img src="<%= page.image_url %>" style="display: block; width: 100%; border: 1px solid #eee;" />
       
-        <% @document.pins.each do |pin| %>
+        <% page.pins.each do |pin| %>
           <a href="#comment-<%= pin.id %>" onclick="event.stopPropagation()" style="position: absolute; left: <%= pin.x_coordinate %>%; top: <%= pin.y_coordinate %>%; transform: translate(-50%, -100%); font-size: 24px; cursor: pointer; z-index: 10; text-decoration: none;" title="<%= pin.body %>">
             📍
-            <div style="position: absolute; top: -5px; right: -10px; background: #e91e63; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: sans-serif; font-weight: bold; border: 2px solid white;">
+            <div style="position: absolute; top: -5px; right: -10px; background: #e91e63; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px solid white;">
               <%= pin.marker_number %>
             </div>
           </a>
         <% end %>
-
       </div>
-    </div>
 
-    <% if @document.pins.any? %>
-      <div style="margin-top: 50px; text-align: left; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-        <h3 style="margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">Comments (<%= @document.pins.count %>)</h3>
-        
-        <% @document.pins.order(:marker_number).each do |pin| %>
+      <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <% page.pins.order(:marker_number).each do |pin| %>
           
-          <div id="comment-<%= pin.id %>" style="margin-bottom: 15px; padding: 15px; background: #f9f9f9; border-radius: 6px; border-left: 4px solid #e91e63; display: flex; gap: 15px;">
-            <div style="background: #e91e63; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+            <div id="comment-<%= pin.id %>" class="comment-row" style="scroll-margin-top: 100px; margin-bottom: 10px; padding: 10px; display: flex; gap: 10px; align-items: flex-start; border-radius: 6px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.backgroundColor='transparent'">            <div style="background: #e91e63; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; font-weight: bold;">
               <%= pin.marker_number %>
             </div>
-            <div>
-              <p style="margin: 0; color: #333; font-size: 16px; line-height: 1.5;"><%= pin.body %></p>
-              <small style="color: #999; font-size: 12px;"><%= time_ago_in_words(pin.created_at) %> ago</small>
+            <div style="font-size: 14px; color: #333; line-height: 1.5;">
+              <%= pin.body %>
             </div>
           </div>
-
+          
         <% end %>
       </div>
-    <% end %>
 
+    </div>
   <% end %>
 
 </div>

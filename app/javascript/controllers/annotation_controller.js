@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["container"]
   // This tells Stimulus to expect the Document ID from the HTML!
-  static values = { documentId: Number } 
+  static values = { documentId: Number, pageId: Number } 
 
   dropPin(event) {
     // Prevent dropping multiple new pins if you haven't saved the current one
@@ -34,7 +34,7 @@ export default class extends Controller {
         <div style="font-size: 24px; text-align: center; margin-bottom: 5px;">📍</div>
         <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); width: 250px; border: 1px solid #ddd;">
           
-          <form action="/documents/${this.documentIdValue}/pins" method="POST" data-turbo="false">
+          <form action="/pages/${this.pageIdValue}/pins" method="POST" data-turbo="false">
             <input type="hidden" name="authenticity_token" value="${csrfToken}">
             <input type="hidden" name="x_coordinate" value="${xPercent}">
             <input type="hidden" name="y_coordinate" value="${yPercent}">

@@ -4,6 +4,11 @@ Rails.application.routes.draw do
   post "capture", to: "home#capture"
 
   resources :documents, only: [ :create, :show, :update, :destroy ] do
+    resources :pages, only: [ :create ]
+    resources :pins, only: [ :create ]
+  end
+
+  resources :pages do
     resources :pins, only: [ :create ]
   end
 
