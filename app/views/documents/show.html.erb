@@ -12,17 +12,24 @@
 </style>
 
 <div style="position: sticky; top: 0; z-index: 1000; background: white; border-bottom: 1px solid #ddd; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <%= link_to "←", root_path, style: "text-decoration: none; font-size: 20px; color: #555;" %>
-    
-    <input type="text" value="<%= @document.title %>" style="font-size: 18px; font-weight: 500; border: none; padding: 5px; border-radius: 4px; width: 300px;" placeholder="Untitled Document">
+
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <%= link_to "←", root_path, style: "text-decoration: none; color: #555; font-weight: bold; font-size: 20px; padding: 0 10px;" %>
+
+    <%= form_with model: @document, style: "margin: 0;" do |form| %>
+      <%= form.text_field :title, 
+            placeholder: "Untitled Document", 
+            style: "font-size: 18px; font-weight: 500; border: 1px solid transparent; padding: 6px 10px; border-radius: 4px; width: 300px; transition: all 0.2s; color: #333;",
+            onmouseover: "this.style.borderColor='#eee'",
+            onmouseout: "this.style.borderColor='transparent'",
+            onfocus: "this.style.borderColor='#4285f4'; this.style.backgroundColor='#fff'; this.style.outline='none'",
+            onchange: "this.form.requestSubmit()",
+            onkeydown: "if(event.key === 'Enter'){ event.preventDefault(); this.blur(); }" %>
+    <% end %>
   </div>
 
-  <div style="display: flex; gap: 10px;">
-    <%= form_with url: document_pages_path(@document), method: :post, data: { turbo: false }, style: "display: flex; gap: 5px;" do |form| %>
-      <%= form.text_field :website_url, placeholder: "Paste URL (e.g. apple.com)...", required: true, style: "padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" %>
-      <%= form.submit "+ Add Page", style: "background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;" %>
-    <% end %>
+  <div style="font-size: 12px; color: #aaa; font-weight: 500;">
+    Changes save automatically
   </div>
 </div>
 
@@ -41,7 +48,7 @@
            data-action="click->annotation#dropPin"
            style="position: relative; display: inline-block; width: 100%;">
            
-        <img src="<%= page.image_url %>" style="display: block; width: 100%; border: 1px solid #eee;" />
+        <img src="<%= page.image.attached? ? url_for(page.image) :  page.image_url %>" style="display: block; width: 100%; border: 1px solid #eee;" />
       
         <% page.pins.each do |pin| %>
           <a href="#comment-<%= pin.id %>" onclick="event.stopPropagation()" style="position: absolute; left: <%= pin.x_coordinate %>%; top: <%= pin.y_coordinate %>%; transform: translate(-50%, -100%); font-size: 24px; cursor: pointer; z-index: 10; text-decoration: none;" title="<%= pin.body %>">
@@ -69,5 +76,35 @@
 
     </div>
   <% end %>
+
+  <div data-controller="upload"
+       data-action="dragover->upload#prevent drop->upload#drop paste@window->upload#paste"
+       style="background: white; border: 2px dashed #ccc; width: 100%; max-width: 1000px; padding: 60px; border-radius: 8px; text-align: center; color: #666; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
+       onmouseover="this.style.borderColor='#4285f4'; this.style.backgroundColor='#f8fbff';"
+       onmouseout="this.style.borderColor='#ccc'; this.style.backgroundColor='white';">
+
+    <div style="font-size: 48px; margin-bottom: 20px;">📄</div>
+    <h3 style="margin-top: 0; color: #333;">Add a new page</h3>
+    <p style="margin-bottom: 30px; font-size: 14px;">Drag & drop an image, paste from clipboard (Ctrl+V), or enter a URL.</p>
+
+    <%= form_with url: document_pages_path(@document), method: :post, html: { multipart: true } do |form| %>
+      
+      <%= form.file_field :file, data: { upload_target: "input", action: "change->upload#submit" }, style: "display: none;" %>
+
+      <div style="display: flex; gap: 10px; justify-content: center; max-width: 400px; margin: 0 auto;">
+        <%= form.text_field :website_url, placeholder: "Paste website URL...", style: "flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" %>
+        <%= form.submit "Fetch URL", style: "background: #4285f4; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;" %>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <span style="font-size: 12px; color: #999; text-transform: uppercase; font-weight: bold;">— or —</span>
+      </div>
+
+      <button type="button" data-action="click->upload#triggerClick" style="margin-top: 20px; background: white; border: 1px solid #ddd; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        📁 Browse Files
+      </button>
+
+    <% end %>
+  </div>
 
 </div>

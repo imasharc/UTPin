@@ -15,36 +15,20 @@ class DocumentsController < ApplicationController
 
   def update
     @document = Document.find(params[:id])
-
-    target_url = params[:website_url]
-    wants_full_page = (params[:full_page] == "1")
-
-    base_url = "https://api.microlink.io/"
-    api_params = { url: target_url, force: "true" }
-
-    if wants_full_page
-      api_params["screenshot.fullPage"] = "true"
+    
+    # Update using the safe, permitted parameters
+    if @document.update(document_params)
+      head :no_content
     else
-      api_params[:screenshot] = "true"
+      head :unprocessable_entity
     end
+  end
 
-    uri = URI(base_url)
-    uri.query = URI.encode_www_form(api_params)
+  private
 
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-
-    request = Net::HTTP::Get.new(uri)
-    response = http.request(request)
-
-    result = JSON.parse(response.body)
-
-    if result["status"] == "success"
-      screenshot_url = result.dig("data", "screenshot", "url")
-      @document.update(image_url: screenshot_url)
-    end
-
-    redirect_to document_path(@document)
+  # This tells Rails "It is safe to let the user change the title!"
+  def document_params
+    params.require(:document).permit(:title)
   end
 
   def destroy
