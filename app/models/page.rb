@@ -1,4 +1,6 @@
 class Page < ApplicationRecord
   belongs_to :document
   has_many :pins, dependent: :destroy
+
+  has_one_attached :image
 end
