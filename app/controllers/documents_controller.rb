@@ -15,7 +15,7 @@ class DocumentsController < ApplicationController
 
   def update
     @document = Document.find(params[:id])
-    
+
     # Update using the safe, permitted parameters
     if @document.update(document_params)
       head :no_content

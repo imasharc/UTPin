@@ -8,7 +8,7 @@ class PagesController < ApplicationController
 
     if params[:file].present?
       @document.pages.create!(image: params[:file], position: position)
-    
+
     elsif params[:website_url].present?
       target_url = params[:website_url]
       base_url = "https://api.microlink.io/"
